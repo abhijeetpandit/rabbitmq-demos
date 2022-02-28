@@ -9,7 +9,7 @@ import com.rabbitmq.client.DeliverCallback;
 public class Recv {
 
     private final static String QUEUE_NAME = "hello";
-
+/*added comment*/
     public static void main(String[] argv) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("localhost");
