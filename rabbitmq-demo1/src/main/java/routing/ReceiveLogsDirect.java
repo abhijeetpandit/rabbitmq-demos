@@ -3,29 +3,32 @@ import com.rabbitmq.client.*;
 
 public class ReceiveLogsDirect {
 
-  private static final String EXCHANGE_NAME = "direct_logs";
+  private static final String EXCHANGE_NAME = "testEx1";
 
   public static void main(String[] argvs) throws Exception {
     ConnectionFactory factory = new ConnectionFactory();
-    factory.setHost("localhost");
+    factory.setHost("172.19.1.167");
+	factory.setUsername("insync");
+    factory.setPassword("admin123");
     Connection connection = factory.newConnection();
-    
+    Channel channel = connection.createChannel();
+
+    channel.exchangeDeclare(EXCHANGE_NAME, "direct", true);
 
     String[] argv = new String[] {"0", "1", "2"};
     
-    for (String severity : argv) {
-    	Channel channel = connection.createChannel();
-
-        channel.exchangeDeclare(EXCHANGE_NAME, "direct");
+    for (String partition : argv) {
         String queueName = channel.queueDeclare().getQueue();
-        channel.queueBind(queueName, EXCHANGE_NAME, severity);
+        channel.queueBind(queueName, EXCHANGE_NAME, partition);
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), "UTF-8");
-            System.out.println();
             try {
-            	System.out.println(severity+"->>>>>"+Thread.currentThread().getName() + "--->" + " [x] Received '" +
+            	System.out.println("partition =" +partition+"->>>>>"+Thread.currentThread().getName() + "--->" + " [x] Received '" +
                         delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
-            	Thread.sleep(1000);
+            	if(partition.equals("0"))
+            		Thread.sleep(10000);
+            	else
+            		Thread.sleep(50);
     		} catch (Exception e) {
     			e.printStackTrace();
     		}

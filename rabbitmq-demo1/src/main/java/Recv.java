@@ -8,19 +8,20 @@ import com.rabbitmq.client.DeliverCallback;
 
 public class Recv {
 
-    private final static String QUEUE_NAME = "hello";
+    private final static String QUEUE_NAME = "queue2";
 /*added comment*/
     public static void main(String[] argv) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
+        factory.setHost("172.19.1.167");
+		factory.setUsername("insync");
+        factory.setPassword("admin123");
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
         channel.basicQos(1);
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        channel.queueDeclare(QUEUE_NAME, true, false, false, null);
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
         extracted(channel, "aa");
-        extracted(channel, "bb");
     }
 
 	private static void extracted(Channel channel, final String name) throws IOException {
@@ -29,7 +30,7 @@ public class Recv {
             System.out.println(name+" [x] Received '" + message + "'");
             try {
             	System.out.println(Thread.currentThread().getName());
-            	Thread.sleep(1000);
+            	Thread.sleep(1);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
